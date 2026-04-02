@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<title>รายงานตรวจสอบคุณภาพ</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+  /* เมนูด้านซ้าย */
+  #sidebar { width: 200px; background: #f0f0f0; height: 100vh; position: fixed; padding: 10px; }
+  #content { margin-left: 210px; padding: 10px; }
+  h2 { background: #007bff; color: #fff; padding: 10px; margin-top: 20px; }
+  .section { border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; }
+  label { display: block; margin-top: 10px; }
+  input[type=text], input[type=date], textarea, select { width: 100%; padding: 5px; margin-top: 5px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  table, th, td { border: 1px solid #999; }
+  th, td { padding: 8px; }
+  .btn { padding: 8px 12px; margin-top: 10px; cursor: pointer; }
+  .btn-green { background-color: #28a745; color: #fff; }
+  .btn-red { background-color: #dc3545; color: #fff; }
+  .approve-box { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar menu -->
+<div id="sidebar">
+  <h3>Menu</h3>
+  <ul>
+    <li><button onclick="showSection('section1')">ข้อมูลเบื้องต้น</button></li>
+    <li><button onclick="showSection('section2')">ตรวจสอบ</button></li>
+    <li><button onclick="showSection('section3')">อนุมัติ</button></li>
+    <li><button onclick="generateReport()">สร้างรายงาน</button></li>
+  </ul>
+</div>
+
+<!-- ตัวเนื้อหา -->
+<div id="content">
+  <!-- ข้อมูลเบื้องต้น -->
+  <div id="section1" class="section">
+    <h2>ข้อมูลเบื้องต้น</h2>
+    <label>เลขที่คำร้อง <input type="text" id="complaintNo"></label>
+    <label>Lot / Batch No. <input type="text" id="lotNo"></label>
+    <label>Plant <input type="text" id="plant"></label>
+    <label>Specification <input type="text" id="spec"></label>
+    <label>Po No. <input type="text" id="poNo"></label>
+    <label>Inspection จำนวน <input type="number" id="inspectionQty" value="10"></label>
+    <label>จำนวน NG <input type="number" id="ngQty" value="1600"></label>
+    <label>Remark <input type="text" id="remark"></label>
+    <label>Supplier <input type="text" id="supplier" value="CHALERMCHAICHA CO.,LTD"></label>
+    <!-- แนบไฟล์ -->
+    <div>
+      <p>ไฟล์แนบ:</p>
+      <input type="file" id="fileUpload" multiple />
+    </div>
+  </div>
+  
+  <!-- ตรวจสอบ -->
+  <div id="section2" class="section" style="display:none;">
+    <h2>ตรวจสอบ</h2>
+    <table id="checkTable">
+      <thead>
+        <tr>
+          <th>ปัญหา</th>
+          <th>แนวทางแก้ไข</th>
+          <th>วันที่เริ่ม</th>
+          <th>วันที่เสร็จ</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button onclick="addCheckRow()">เพิ่มแถว</button>
+  </div>
+  
+  <!-- อนุมัติ -->
+  <div id="section3" class="section" style="display:none;">
+    <h2>อนุมัติ</h2>
+    <div class="approve-box">
+      <button class="btn btn-green" onclick="approve('approve')">อนุมัติ</button>
+      <button class="btn btn-red" onclick="approve('reject')">ไม่อนุมัติ</button>
+    </div>
+    <div>
+      <label>หมายเหตุ:</label>
+      <textarea id="remarkApprove"></textarea>
+    </div>
+    <div>
+      <label>ชื่อผู้อนุมัติ:</label>
+      <input type="text" id="approverName" />
+    </div>
+    <div>
+      <label>อีเมลผู้อนุมัติ:</label>
+      <input type="text" id="approverEmail" />
+    </div>
+  </div>
+  
+  <!-- รายงาน -->
+  <div id="reportSection" style="display:none;">
+    <h2>รายงานสรุป</h2>
+    <div id="reportContent"></div>
+    <button onclick="printReport()">พิมพ์รายงาน</button>
+  </div>
+</div>
+
+<script>
+  // สลับส่วน
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.style.display='none');
+    document.getElementById(id).style.display='block';
+  }
+
+  // เพิ่มแถวในตารางตรวจสอบ
+  function addCheckRow() {
+    const tbody = document.querySelector('#checkTable tbody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input type="text" class="problem"></td>
+      <td><input type="text" class="solution"></td>
+      <td><input type="date" class="startDate"></td>
+      <td><input type="date" class="endDate"></td>
+    `;
+    tbody.appendChild(row);
+  }
+
+  // อนุมัติ/ปฏิเสธ
+  let approvalStatus = '';
+  function approve(status) {
+    approvalStatus = status;
+    alert('สถานะ: ' + status);
+  }
+
+  // สร้างรายงาน
+  function generateReport() {
+    const reportDiv = document.getElementById('reportContent');
+    reportDiv.innerHTML = '';
+
+    // ข้อมูลเบื้องต้น
+    reportDiv.innerHTML += '<h3>ข้อมูลเบื้องต้น</h3>';
+    reportDiv.innerHTML += `<p>เลขที่คำร้อง: ${document.getElementById('complaintNo').value}</p>`;
+    reportDiv.innerHTML += `<p>Lot / Batch No.: ${document.getElementById('lotNo').value}</p>`;
+    reportDiv.innerHTML += `<p>Plant: ${document.getElementById('plant').value}</p>`;
+    reportDiv.innerHTML += `<p>Specification: ${document.getElementById('spec').value}</p>`;
+    reportDiv.innerHTML += `<p>Po No.: ${document.getElementById('poNo').value}</p>`;
+    reportDiv.innerHTML += `<p>Inspection Qty: ${document.getElementById('inspectionQty').value}</p>`;
+    reportDiv.innerHTML += `<p>NG Qty: ${document.getElementById('ngQty').value}</p>`;
+    reportDiv.innerHTML += `<p>Remark: ${document.getElementById('remark').value}</p>`;
+    reportDiv.innerHTML += `<p>Supplier: ${document.getElementById('supplier').value}</p>`;
+    // แนบไฟล์ (ชื่อไฟล์)
+    const fileInput = document.getElementById('fileUpload');
+    if(fileInput.files.length > 0){
+      reportDiv.innerHTML += '<h4>ไฟล์แนบ:</h4>';
+      for(let i=0; i<fileInput.files.length; i++){
+        reportDiv.innerHTML += `<p>${fileInput.files[i].name}</p>`;
+      }
+    }
+
+    // ตรวจสอบ
+    reportDiv.innerHTML += '<h3>การตรวจสอบ</h3>';
+    const rows = document.querySelectorAll('#checkTable tbody tr');
+    if(rows.length > 0){
+      reportDiv.innerHTML += '<table border="1" style="width:100%; border-collapse:collapse;">';
+      reportDiv.innerHTML += '<tr><th>ปัญหา</th><th>แนวทางแก้ไข</th><th>วันที่เริ่ม</th><th>วันที่เสร็จ</th></tr>';
+      rows.forEach(r => {
+        const cells = r.querySelectorAll('td');
+        reportDiv.innerHTML += `<tr>
+          <td>${cells[0].querySelector('input').value}</td>
+          <td>${cells[1].querySelector('input').value}</td>
+          <td>${cells[2].querySelector('input').value}</td>
+          <td>${cells[3].querySelector('input').value}</td>
+        </tr>`;
+      });
+      reportDiv.innerHTML += '</table>';
+    }
+
+    // อนุมัติ
+    reportDiv.innerHTML += '<h3>ผลการอนุมัติ</h3>';
+    reportDiv.innerHTML += `<p>สถานะ: ${approvalStatus}</p>`;
+    reportDiv.innerHTML += `<p>หมายเหตุ: ${document.getElementById('remarkApprove').value}</p>`;
+    reportDiv.innerHTML += `<p>ชื่อผู้อนุมัติ: ${document.getElementById('approverName').value}</p>`;
+    reportDiv.innerHTML += `<p>อีเมล: ${document.getElementById('approverEmail').value}</p>`;
+
+    // แสดงผล
+    document.getElementById('reportSection').style.display='block';
+  }
+
+  // พิมพ์รายงาน
+  function printReport() {
+    const content = document.getElementById('reportContent').innerHTML;
+    const newWin = window.open('');
+    newWin.document.write('<html><head><title>รายงาน</title></head><body>');
+    newWin.document.write(content);
+    newWin.document.write('</body></html>');
+    newWin.document.close();
+    newWin.print();
+  }
+</script>
+
+</body>
+</html>
