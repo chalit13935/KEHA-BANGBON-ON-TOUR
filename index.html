@@ -1,77 +1,51 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Keha Bangbon</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Keha Bangbon</title>
 
-<style>
-body {
-  margin:0;
-  font-family:sans-serif;
-  background:#0a0f0a;
-  color:#fff;
-  padding:20px;
-}
-.card {
-  background:#111;
-  padding:15px;
-  margin-bottom:10px;
-  border-radius:10px;
-}
-</style>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0a0f0a;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      transition: opacity 0.3s ease;
+    }
+  </style>
 </head>
 
 <body>
 
-<h2>💰 รายการล่าสุด</h2>
-<div id="list"></div>
+  <iframe id="appFrame"
+    src="https://script.google.com/macros/s/AKfycbxYLg1fEBwqbdMNeRM_TGFcMUZVlYxBEP1e7yJ0jMrDIbPhCdsTg5P5A3jF_BA9Ir5GiQ/exec">
+  </iframe>
 
-<script>
+  <script>
+    const frame = document.getElementById('appFrame');
 
-const API = "https://script.google.com/macros/s/AKfycbxYLg1fEBwqbdMNeRM_TGFcMUZVlYxBEP1e7yJ0jMrDIbPhCdsTg5P5A3jF_BA9Ir5GiQ/exec";
+    function reloadFrameSmooth() {
+      frame.style.opacity = 0.3; // เฟดออก
 
-let lastHash = "";
+      setTimeout(() => {
+        frame.src = frame.src.split('?')[0] + '?t=' + Date.now(); // 🔥 กัน cache
+        frame.style.opacity = 1;
+      }, 300);
+    }
 
-async function loadData() {
-  try {
-    const res = await fetch(API);
-    const data = await res.json();
-
-    const hash = JSON.stringify(data);
-    if (hash === lastHash) return; // 🔥 ไม่เปลี่ยน = ไม่ render
-
-    lastHash = hash;
-
-    render(data);
-
-  } catch (e) {
-    console.log(e);
-  }
-}
-
-function render(data) {
-  const list = document.getElementById("list");
-  list.innerHTML = "";
-
-  data.expenses.forEach(row => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <div>${row[1]}</div>
-      <div>฿${row[2]}</div>
-    `;
-    list.appendChild(div);
-  });
-}
-
-// 🔥 โหลดครั้งแรก
-loadData();
-
-// 🔥 realtime แบบเนียน
-setInterval(loadData, 3000);
-
-</script>
+    // 🔥 reload ทุก 5 วิ (ปรับได้)
+    setInterval(() => {
+      reloadFrameSmooth();
+    }, 5000);
+  </script>
 
 </body>
 </html>
