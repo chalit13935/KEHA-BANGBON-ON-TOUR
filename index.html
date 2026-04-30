@@ -1,71 +1,77 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Keha Bangbon</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keha Bangbon</title>
 
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      background-color: #0a0f0a;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      transition: opacity 0.25s ease;
-    }
-  </style>
+<style>
+body {
+  margin:0;
+  font-family:sans-serif;
+  background:#0a0f0a;
+  color:#fff;
+  padding:20px;
+}
+.card {
+  background:#111;
+  padding:15px;
+  margin-bottom:10px;
+  border-radius:10px;
+}
+</style>
 </head>
 
 <body>
 
-  <iframe id="appFrame"
-    src="https://script.google.com/macros/s/AKfycbzR2LqvHNqJdxAeazEUJeKBi_5ohzZ2qwQ1UEGRiPI7TTto3UlRy2eFBPQDOnRR6Uhmpw/exec">
-  </iframe>
+<h2>💰 รายการล่าสุด</h2>
+<div id="list"></div>
 
-  <script>
-    const frame = document.getElementById('appFrame');
+<script>
 
-    let isRefreshing = false;
-    let isActive = true;
+const API = "https://script.google.com/macros/s/AKfycbzR2LqvHNqJdxAeazEUJeKBi_5ohzZ2qwQ1UEGRiPI7TTto3UlRy2eFBPQDOnRR6Uhmpw/exec?api=1";
 
-    // 🔥 เช็ค user ยังอยู่หน้าไหม
-    document.addEventListener('visibilitychange', () => {
-      isActive = !document.hidden;
-    });
+let lastHash = "";
 
-    function reloadFrameSmooth() {
-      if (isRefreshing) return; // กันซ้อน
-      isRefreshing = true;
+async function loadData() {
+  try {
+    const res = await fetch(API);
+    const data = await res.json();
 
-      frame.style.opacity = 0.4;
+    const hash = JSON.stringify(data);
+    if (hash === lastHash) return; // 🔥 ไม่เปลี่ยน = ไม่ render
 
-      setTimeout(() => {
-        const base = frame.src.split('?')[0];
-        frame.src = base + '?t=' + Date.now(); // กัน cache
-      }, 200);
+    lastHash = hash;
 
-      // รอโหลดเสร็จแล้วค่อย fade กลับ
-      frame.onload = () => {
-        frame.style.opacity = 1;
-        isRefreshing = false;
-      };
-    }
+    render(data);
 
-    // 🔥 รีทุก 10 วิ (ลดกระพริบ)
-    setInterval(() => {
-      if (isActive) {
-        reloadFrameSmooth();
-      }
-    }, 10000);
+  } catch (e) {
+    console.log(e);
+  }
+}
 
-  </script>
+function render(data) {
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.expenses.forEach(row => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <div>${row[1]}</div>
+      <div>฿${row[2]}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// 🔥 โหลดครั้งแรก
+loadData();
+
+// 🔥 realtime แบบเนียน
+setInterval(loadData, 3000);
+
+</script>
 
 </body>
 </html>
