@@ -1,19 +1,51 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Keha Bangbon</title>
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #0a0f0a; }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Keha Bangbon</title>
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0a0f0a;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      transition: opacity 0.3s ease;
+    }
+  </style>
 </head>
+
 <body>
-    <iframe src="https://script.google.com/macros/s/AKfycbwxiD07_VSMDADd_tOg4DvUhFnmDkRG0ZuWeNZ6d8YWKJ5xmGftZfKdIDkK4Ai_Sz3VSg/exec"></iframe>
+
+  <iframe id="appFrame"
+    src="https://script.google.com/macros/s/AKfycbzaW5yP558NhGjy6-wfgRXfjbgjTq7GMWs9BEJDriFtC4I33FenFdmYBCBBt15GR_Wc_A/exec">
+  </iframe>
+
+  <script>
+    const frame = document.getElementById('appFrame');
+
+    function reloadFrameSmooth() {
+      frame.style.opacity = 0.3; // เฟดออก
+
+      setTimeout(() => {
+        frame.src = frame.src.split('?')[0] + '?t=' + Date.now(); // 🔥 กัน cache
+        frame.style.opacity = 1;
+      }, 300);
+    }
+
+    // 🔥 reload ทุก 5 วิ (ปรับได้)
+    setInterval(() => {
+      reloadFrameSmooth();
+    }, 3000);
+  </script>
+
 </body>
 </html>
