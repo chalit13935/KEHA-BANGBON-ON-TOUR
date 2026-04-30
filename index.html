@@ -18,7 +18,7 @@
       width: 100%;
       height: 100%;
       border: none;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.25s ease;
     }
   </style>
 </head>
@@ -32,19 +32,39 @@
   <script>
     const frame = document.getElementById('appFrame');
 
+    let isRefreshing = false;
+    let isActive = true;
+
+    // 🔥 เช็ค user ยังอยู่หน้าไหม
+    document.addEventListener('visibilitychange', () => {
+      isActive = !document.hidden;
+    });
+
     function reloadFrameSmooth() {
-      frame.style.opacity = 0.3; // เฟดออก
+      if (isRefreshing) return; // กันซ้อน
+      isRefreshing = true;
+
+      frame.style.opacity = 0.4;
 
       setTimeout(() => {
-        frame.src = frame.src.split('?')[0] + '?t=' + Date.now(); // 🔥 กัน cache
+        const base = frame.src.split('?')[0];
+        frame.src = base + '?t=' + Date.now(); // กัน cache
+      }, 200);
+
+      // รอโหลดเสร็จแล้วค่อย fade กลับ
+      frame.onload = () => {
         frame.style.opacity = 1;
-      }, 300);
+        isRefreshing = false;
+      };
     }
 
-    // 🔥 reload ทุก 5 วิ (ปรับได้)
+    // 🔥 รีทุก 10 วิ (ลดกระพริบ)
     setInterval(() => {
-      reloadFrameSmooth();
-    }, 3000);
+      if (isActive) {
+        reloadFrameSmooth();
+      }
+    }, 10000);
+
   </script>
 
 </body>
