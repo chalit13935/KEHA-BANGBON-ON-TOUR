@@ -1,19 +1,85 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Keha Bangbon</title>
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #0a0f0a; }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keha Bangbon</title>
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #0a0f0a;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* 🔥 Loading Screen */
+    #loading {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: #0a0f0a;
+      color: #00e5ff;
+      z-index: 10;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0,229,255,0.2);
+      border-top: 4px solid #00e5ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
+
 <body>
-    <iframe src="https://script.google.com/macros/s/AKfycbxsK2ZykOumfhCakbM7Ym4s-guR9ZBp6hbA4pMEf__O0i4qitNrs9yDHf5SDVpjhvPGvA/exec"></iframe>
+
+  <!-- 🔥 Loading -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <div>กำลังโหลดระบบ...</div>
+  </div>
+
+  <!-- 🔥 iframe -->
+  <iframe 
+    id="appFrame"
+    loading="lazy"
+    src="https://script.google.com/macros/s/AKfycbyUEn5x4jQm8rRFWcEUz3KIlK9zCq9VMSz9EW3nj3Xr_0KG-w3SdvWt_pMQNnxzRSyHWQ/exec">
+  </iframe>
+
+  <script>
+    const frame = document.getElementById("appFrame");
+    const loading = document.getElementById("loading");
+
+    // 🔥 ซ่อน loading เมื่อโหลดเสร็จ
+    frame.onload = () => {
+      loading.style.opacity = "0";
+      setTimeout(() => loading.style.display = "none", 300);
+    };
+
+    // 🔥 กันค้าง (fallback)
+    setTimeout(() => {
+      loading.style.display = "none";
+    }, 7000);
+  </script>
+
 </body>
 </html>
