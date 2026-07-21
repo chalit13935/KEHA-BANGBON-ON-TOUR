@@ -3,82 +3,157 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Keha Bangbon</title>
+  <title>KEHA BANGBON</title>
+  
+  <!-- Font Google ช่วยเพิ่มความหรูหรา -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600&family=Prompt:wght@300;400;500&display=swap" rel="stylesheet">
 
   <style>
-    body, html {
+    :root {
+      --bg-dark: #081219;
+      --bg-ocean: #0b1e28;
+      --accent-cyan: #00f2fe;
+      --accent-glow: rgba(0, 242, 254, 0.25);
+      --text-main: #e0f7fa;
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+
+    body, html {
+      width: 100%;
       height: 100%;
-      background-color: #0a0f0a;
       overflow: hidden;
-      font-family: sans-serif;
+      font-family: 'Prompt', 'Plus Jakarta Sans', sans-serif;
+      /* พื้นหลังไล่เฉดสีลึกสไตล์มหาสมุทร */
+      background: radial-gradient(circle at 50% 20%, #0d2b3a 0%, var(--bg-dark) 100%);
+      color: var(--text-main);
+    }
+
+    /* 🔥 Iframe Container */
+    .iframe-wrapper {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
     }
 
     iframe {
       width: 100%;
       height: 100%;
       border: none;
+      display: block;
     }
 
-    /* 🔥 Loading Screen */
+    /* 🔥 Loading Screen เรียบหรูสไตล์ทะเล */
     #loading {
       position: fixed;
       inset: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      flex-direction: column;
-      background: #0a0f0a;
-      color: #00e5ff;
-      z-index: 10;
+      background: radial-gradient(circle at center, #0e2a38 0%, var(--bg-dark) 100%);
+      z-index: 99;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
 
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(0,229,255,0.2);
-      border-top: 4px solid #00e5ff;
+    /* วงเกลียวคลื่นแบบมินิมอล */
+    .ocean-spinner {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      margin-bottom: 20px;
+    }
+
+    .ocean-spinner::before,
+    .ocean-spinner::after {
+      content: "";
+      position: absolute;
+      inset: 0;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 12px;
+      border: 2px solid transparent;
     }
 
+    .ocean-spinner::before {
+      border-top-color: var(--accent-cyan);
+      border-right-color: var(--accent-cyan);
+      animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .ocean-spinner::after {
+      border-bottom-color: rgba(0, 242, 254, 0.3);
+      border-left-color: rgba(0, 242, 254, 0.3);
+      animation: spin 0.8s linear infinite reverse;
+    }
+
+    .loading-text {
+      font-size: 0.95rem;
+      letter-spacing: 2px;
+      font-weight: 300;
+      color: #b2ebf2;
+      text-transform: uppercase;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* Animation Keyframes */
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* Class สำหรับซ่อน Loading */
+    .fade-out {
+      opacity: 0;
+      visibility: hidden;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- 🔥 Loading -->
+  <!-- 🔥 Loading Screen -->
   <div id="loading">
-    <div class="spinner"></div>
-    <div>กำลังโหลดระบบ...</div>
+    <div class="ocean-spinner"></div>
+    <div class="loading-text">KEHA BANGBON</div>
   </div>
 
-  <!-- 🔥 iframe -->
-  <iframe 
-    id="appFrame"
-    loading="lazy"
-    src="https://script.google.com/macros/s/AKfycbyWpHiDV6XPCbJib9ODm3Rt78kDlBdSWNHhSzaRHy-I7U0-GJ8Vysjr24QTFiLgSFXdjg/exec">
-  </iframe>
+  <!-- 🔥 App Frame -->
+  <div class="iframe-wrapper">
+    <iframe 
+      id="appFrame"
+      loading="eager" 
+      src="https://script.google.com/macros/s/AKfycbyWpHiDV6XPCbJib9ODm3Rt78kDlBdSWNHhSzaRHy-I7U0-GJ8Vysjr24QTFiLgSFXdjg/exec">
+    </iframe>
+  </div>
 
   <script>
     const frame = document.getElementById("appFrame");
     const loading = document.getElementById("loading");
 
-    // 🔥 ซ่อน loading เมื่อโหลดเสร็จ
-    frame.onload = () => {
-      loading.style.opacity = "0";
-      setTimeout(() => loading.style.display = "none", 300);
-    };
+    // ฟังก์ชั่นปิดหน้า Loading
+    function hideLoading() {
+      if (!loading.classList.contains("fade-out")) {
+        loading.classList.add("fade-out");
+      }
+    }
 
-    // 🔥 กันค้าง (fallback)
-    setTimeout(() => {
-      loading.style.display = "none";
-    }, 7000);
+    // ซ่อนเมื่อ iframe โหลดเสร็จ
+    frame.onload = hideLoading;
+
+    // Fallback: กันค้างกรณีเน็ตช้า (ปรับเหลือ 4 วินาทีเพื่อความเร็ว)
+    setTimeout(hideLoading, 4000);
   </script>
 
 </body>
